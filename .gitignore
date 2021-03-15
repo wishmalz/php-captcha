@@ -5,6 +5,8 @@
 # IntelliJ project files
 .idea
 .docker
+Dockerfile
+docker-compose.yml
 *.iml
 out
 gen
@@ -79,3 +81,4 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+/src/wishexxt/Captcha/index.php
