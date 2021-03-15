@@ -70,6 +70,8 @@ if ($needNoise) {
     }
 }
 
+arrow($captchaImage, 0, 0, 100, 100,  $arrowColor);
+
 // The PHP-file will be rendered as image
 header('Content-type: image/png');
 
@@ -95,4 +97,25 @@ function setColor($image, $hexColor)
     $color = hexToRgb($hexColor);
 
     return imagecolorallocate($image, $color['red'], $color['green'], $color['blue']);
+}
+
+function arrow($im, $x1, $y1, $x2, $y2, $color, $arrowLength = 25, $arrowWidth = 10) {
+    $distance = sqrt((($x1 - $x2) ** 2) + (($y1 - $y2) ** 2));
+
+    $dx = $x2 + ($x1 - $x2) * $arrowLength / $distance;
+    $dy = $y2 + ($y1 - $y2) * $arrowLength / $distance;
+
+    $k = $arrowWidth / $arrowLength;
+
+    $x2o = $x2 - $dx;
+    $y2o = $dy - $y2;
+
+    $x3 = $y2o * $k + $dx;
+    $y3 = $x2o * $k + $dy;
+
+    $x4 = $dx - $y2o * $k;
+    $y4 = $dy - $x2o * $k;
+
+    imageline($im, $x1, $y1, $dx, $dy, $color);
+    imagefilledpolygon($im, array($x2, $y2, $x3, $y3, $x4, $y4), 3, $color);
 }
