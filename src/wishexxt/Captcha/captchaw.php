@@ -14,10 +14,10 @@ $captchaWidth = $config['width'];
 $totalCharacters = $config['length'];
 $possibleLetters = $config['symbols'];
 $captchaFont = $config['font'];
-$randomDots = 50;
-$randomLines = 25;
+$needNoise = $config['noise'];
+$randomDots = $config['noiseDotsCount'];
+$randomLines = $config['noiseLinesCount'];
 $textColor = $config['textColor'];
-$noiseColor = $config['noiseColor'];
 $arrowColor = $config['arrowColor'];
 $bgColor = $config['bgColor'];
 
@@ -29,7 +29,7 @@ for ($i = 0; $i < $totalCharacters; $i++) {
 $_SESSION['captcha'] = $captcha;
 
 // Font size
-$captchaFontSize = $captchaHeight * 0.65;
+$captchaFontSize = $captchaHeight * 0.3;
 
 // Initial image
 $captchaImage = imagecreatetruecolor($captchaWidth, $captchaHeight);
@@ -37,11 +37,38 @@ $captchaImage = imagecreatetruecolor($captchaWidth, $captchaHeight);
 // Set colors
 $bgColor = setColor($captchaImage, $bgColor);
 $textColor = setColor($captchaImage, $textColor);
-$noiseColor = setColor($captchaImage, $noiseColor);
 $arrowColor = setColor($captchaImage, $arrowColor);
 
 // Give the image background color
 imagefill($captchaImage, 0, 0, $bgColor);
+
+// If we need noise on the image
+if ($needNoise) {
+    // Dots noise
+    for ($captchaDotsCount = 0; $captchaDotsCount < $randomDots; $captchaDotsCount++) {
+        $noiseColor = imagecolorallocate($captchaImage, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+        imagefilledellipse(
+            $captchaImage,
+            mt_rand(0, $captchaWidth),
+            mt_rand(0, $captchaHeight),
+            5,
+            5,
+            $noiseColor
+        );
+    }
+    // Lines noise
+    for ($captchaLinesCount = 0; $captchaLinesCount < $randomLines; $captchaLinesCount++) {
+        $noiseColor = imagecolorallocate($captchaImage, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+        imageline(
+            $captchaImage,
+            mt_rand(0, $captchaWidth),
+            mt_rand(0, $captchaHeight),
+            mt_rand(0, $captchaWidth),
+            mt_rand(0, $captchaHeight),
+            $noiseColor
+        );
+    }
+}
 
 // The PHP-file will be rendered as image
 header('Content-type: image/png');
@@ -63,7 +90,9 @@ function hexToRgb($hexString)
     );
 }
 
-function setColor($image, $hexColor) {
+function setColor($image, $hexColor)
+{
     $color = hexToRgb($hexColor);
+
     return imagecolorallocate($image, $color['red'], $color['green'], $color['blue']);
 }
