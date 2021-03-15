@@ -70,6 +70,8 @@ if ($needNoise) {
     }
 }
 
+// Bolder line for arrows
+imagesetthickness($captchaImage, 5);
 arrow($captchaImage, 0, 0, 100, 100,  $arrowColor);
 
 // The PHP-file will be rendered as image
