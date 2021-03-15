@@ -19,3 +19,8 @@ $textColor = $config['textColor'];
 $noiseColor = $config['noiseColor'];
 $arrowColor = $config['arrowColor'];
 $bgColor = $config['bgColor'];
+
+for ($i = 0; $i < $totalCharacters; $i++) {
+    $captcha .= substr($possibleLetters, mt_rand(0, strlen($possibleLetters) - 1), 1);
+}
+$_SESSION['captcha'] = $captcha;
