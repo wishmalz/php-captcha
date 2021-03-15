@@ -25,11 +25,9 @@ $bgColor = $config['bgColor'];
 for ($i = 0; $i < $totalCharacters; $i++) {
     $captcha .= substr($possibleLetters, mt_rand(0, strlen($possibleLetters) - 1), 1);
 }
+$direction = mt_rand(1, 2); // captcha direction
 // Store captcha for the session
-$_SESSION['captcha'] = $captcha;
-
-// Font size
-$captchaFontSize = $captchaHeight * 0.3;
+$direction === 1 ? $_SESSION['captcha'] = $captcha : $_SESSION['captcha'] = strrev($captcha);
 
 // Initial image
 $captchaImage = imagecreatetruecolor($captchaWidth, $captchaHeight);
@@ -71,13 +69,42 @@ if ($needNoise) {
 }
 
 // Bolder line for arrows
-imagesetthickness($captchaImage, 5);
-arrow($captchaImage, 0, 0, 100, 100,  $arrowColor);
+imagesetthickness($captchaImage, 4);
 
-// The PHP-file will be rendered as image
+// Font size
+$captchaLen = strlen($captcha);
+$captchaFontSize = $captchaWidth / ($captchaLen * 2);
+
+// Place text on the image
+$x = $captchaFontSize;
+$y = $captchaHeight / 1.75;
+for ($i = 1; $i <= $captchaLen; $i++) {
+    imagettftext(
+        $captchaImage,
+        $captchaFontSize,
+        mt_rand(-30, 30),
+        $x + $captchaFontSize * ($i - 1) * 2,
+        $y,
+        $textColor,
+        $captchaFont,
+        $captcha[$i - 1]
+    );
+    if ($i !== $captchaLen) {
+        if ($direction === 1) { // straight
+            arrow($captchaImage, $x + $captchaFontSize * ($i - 1) * 2 + $captchaFontSize, $y / 1.15, $x + $captchaFontSize *
+                ($i - 1) * 2 + $captchaFontSize * 2, $y / 1.15, $arrowColor);
+        } else { // forward
+            arrow($captchaImage, $x + $captchaFontSize *
+                ($i - 1) * 2 + $captchaFontSize * 2, $y / 1.15, $x + $captchaFontSize * ($i - 1) * 2 + $captchaFontSize, $y / 1.15, $arrowColor);
+        }
+    }
+
+}
+
+// The PHP-file will be rendered as png image
 header('Content-type: image/png');
 
-// Output the captcha as PNG image the browser
+// Output the captcha as PNG image to the browser
 imagepng($captchaImage);
 
 // Free memory
@@ -101,7 +128,8 @@ function setColor($image, $hexColor)
     return imagecolorallocate($image, $color['red'], $color['green'], $color['blue']);
 }
 
-function arrow($im, $x1, $y1, $x2, $y2, $color, $arrowLength = 25, $arrowWidth = 10) {
+function arrow($im, $x1, $y1, $x2, $y2, $color, $arrowLength = 10, $arrowWidth = 5)
+{
     $distance = sqrt((($x1 - $x2) ** 2) + (($y1 - $y2) ** 2));
 
     $dx = $x2 + ($x1 - $x2) * $arrowLength / $distance;
