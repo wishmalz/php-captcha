@@ -34,12 +34,14 @@ $captchaFontSize = $captchaHeight * 0.65;
 // Initial image
 $captchaImage = imagecreatetruecolor($captchaWidth, $captchaHeight);
 
-// Set background color
-$bgColor = hexToRgb($bgColor);
-$backgroundColor = imagecolorallocate($captchaImage, $bgColor['red'], $bgColor['green'], $bgColor['blue']);
+// Set colors
+$bgColor = setColor($captchaImage, $bgColor);
+$textColor = setColor($captchaImage, $textColor);
+$noiseColor = setColor($captchaImage, $noiseColor);
+$arrowColor = setColor($captchaImage, $arrowColor);
 
 // Give the image background color
-imagefill($captchaImage, 0, 0, $backgroundColor);
+imagefill($captchaImage, 0, 0, $bgColor);
 
 // The PHP-file will be rendered as image
 header('Content-type: image/png');
@@ -59,4 +61,9 @@ function hexToRgb($hexString)
         "green" => 0xFF & ($hexDec >> 0x8),
         "blue" => 0xFF & $hexDec
     );
+}
+
+function setColor($image, $hexColor) {
+    $color = hexToRgb($hexColor);
+    return imagecolorallocate($image, $color['red'], $color['green'], $color['blue']);
 }
